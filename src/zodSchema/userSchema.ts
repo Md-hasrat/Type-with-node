@@ -106,3 +106,7 @@ export const getUserSchema = z.object({
         })
         .email("Invalid email format!!!"),
 })
+
+export const updateUserSchema = z.object({
+    username: z.string().optional(),
+})

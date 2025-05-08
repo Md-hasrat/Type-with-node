@@ -21,6 +21,7 @@ interface UserModel extends Model<UserI>{
     hashPassword(password: string): Promise<string>,
 }
 
+// Define the user schema
 const userSchema: Schema = new Schema<UserI>({
     username: {
         type: String,
