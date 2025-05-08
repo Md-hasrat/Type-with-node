@@ -1,6 +1,6 @@
 import { asyncHandler } from "../../utils/errrorHandler";
 import { Request, Response } from "express"
-import { deleteUserSchema, forgetPasswordSchema, logoutSchema, otpSchema, resetPasswordSchema, userLogedInSchema, userLogedInWithOtpSchema, userRegisterSchema, verifyOtpSchema,getUserSchema } from "../zodSchema/userSchema";
+import { deleteUserSchema, forgetPasswordSchema, logoutSchema, otpSchema, resetPasswordSchema, userLogedInSchema, userLogedInWithOtpSchema, userRegisterSchema, verifyOtpSchema,getUserSchema, updateUserSchema } from "../zodSchema/userSchema";
 import { responseHandler } from "../../utils/responseHandler";
 import User from "../models/userModel";
 import jwt from "jsonwebtoken";
@@ -9,6 +9,10 @@ import { sendOtpEmail } from "../config/nodeMailer";
 import { deleteAllUsersFood } from "../services/userService";
 
 
+// Optional: Custom request type if TypeScript complains about req.userId
+interface AuthenticatedRequest extends Request {
+    userId?: string;
+}
 
 
 export const userRegister = asyncHandler(async (req: Request, res: Response) => {
@@ -314,4 +318,28 @@ export const getUser = asyncHandler(async (req: Request, res: Response) => {
 })  
 
 
-export const updateUser = asyncHandler(async (req: Request, res: Response) => {})
+export const updateUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const validate = updateUserSchema.safeParse(req.body)
+    const userId = req.userId
+
+    if(!validate.success){
+        return responseHandler(res, false, validate.error.errors[0].message, 400)   
+    }
+
+    if(!userId){
+        return responseHandler(res, false, "User not found", 401)   
+    }
+
+    const {username} = validate.data
+
+    const user = await User.findByIdAndUpdate(
+        userId,
+        {username},
+        {new: true}
+    )
+
+    if(!user){
+        return responseHandler(res, false, "User not found", 401)   
+    }
+    return responseHandler(res, true, "User updated successfully!!!", 200,{user})
+})
