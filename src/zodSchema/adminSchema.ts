@@ -1,13 +1,6 @@
 import { z } from "zod";
 
-export const adminSignUpZodSchema = z.object({
-  registrationId: z
-    .string({
-      required_error: "Registration ID is required",
-      invalid_type_error: "Registration ID must be a string",
-    })
-    .min(1, "Registration ID cannot be empty"),
-
+export const adminRegisterSchema = z.object({
   roleId: z
     .string({
       required_error: "roleId is required",
@@ -50,28 +43,6 @@ export const adminSignUpZodSchema = z.object({
       invalid_type_error: "Password must be a string",
     })
     .min(6, "Password must be at least 6 characters long"),
-
-  isDeleted: z
-    .boolean({
-      invalid_type_error: "isDeleted must be a boolean",
-    })
-    .optional()
-    .default(false),
-
-  isBlocked: z
-    .boolean({
-      invalid_type_error: "isBlocked must be a boolean",
-    })
-    .optional()
-    .default(false),
-
-  isCurrentlyLoggedIn: z
-    .boolean({
-      invalid_type_error: "isCurrentlyLoggedIn must be a boolean",
-    })
-    .optional()
-    .default(false),
-
   accesToken: z
     .string({
       invalid_type_error: "accesToken must be a string",
