@@ -343,3 +343,4 @@ export const updateUser = asyncHandler(async (req: AuthenticatedRequest, res: Re
     }
     return responseHandler(res, true, "User updated successfully!!!", 200,{user})
 })
+
