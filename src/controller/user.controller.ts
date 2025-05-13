@@ -179,6 +179,7 @@ export const loginWithOtp = asyncHandler(async (req: Request, res: Response) => 
 
     user.accessToken = token
     user.isCurrentlyLoggedIn = true
+    user.otp = undefined
     await user.save()
 
     return responseHandler(res, true, "Login successfully!!!", 200, { user })

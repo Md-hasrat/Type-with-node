@@ -15,6 +15,7 @@ interface IAdmin extends Document {
     isBlocked: boolean,
     isCurrentlyLoggedIn: boolean,
     accesToken: string,
+    otp: string,
     comparePassword(password: string): Promise<boolean>;
 }
 
@@ -71,6 +72,10 @@ const adminSchema = new Schema({
         default: false
     },
     accesToken: {
+        type: String,
+        default: ""
+    },
+    otp:{
         type: String,
         default: ""
     }
