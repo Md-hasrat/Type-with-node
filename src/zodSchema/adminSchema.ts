@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+
 export const adminRegisterSchema = z.object({
   roleId: z
     .string({
@@ -48,6 +49,30 @@ export const adminRegisterSchema = z.object({
       invalid_type_error: "accesToken must be a string",
     })
     .optional()
+});
+
+
+export const adminLoginSchema = z.object({
+  email: z.string({
+    required_error: "Email is required",
+    invalid_type_error: "Email must be a string",
+  })
+    .email("Invalid email format"),
+
+  password: z.string({
+    required_error: "Password is required",
+    invalid_type_error: "Password must be a string",
+  })
+    .min(6, "Password must be at least 6 characters long"),
+  accessToken: z.string().optional()
+})
+
+
+export const adminLogoutSchema = z.object({
+  adminId: z
+    .string()
+    .regex(/^[0-9a-fA-F]{24}$/, "Invalid admin id"),
+  accessToken: z.string().optional()
 });
 
 

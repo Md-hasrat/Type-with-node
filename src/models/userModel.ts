@@ -76,7 +76,6 @@ userSchema.methods.comparePassword = async function (
 }
 
 
-
 const User = model<UserI,UserModel>("User", userSchema)
 
 export default User
