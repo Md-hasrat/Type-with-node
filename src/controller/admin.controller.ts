@@ -129,7 +129,7 @@ export const getOtp = asyncHandler(async (req: Request, res: Response) => {
     }
 
     const otp = generateOtp(6)
-    console.log("Generated OTP:", otp);
+    // console.log("Generated OTP:", otp);
     
     admin.otp = otp
     await admin.save()
