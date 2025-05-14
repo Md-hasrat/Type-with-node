@@ -7,6 +7,7 @@ import { generateNextCustomId } from "../config/generateUniqueId"
 import jwt from "jsonwebtoken"
 import { generateOtp } from "../config/otpGenerator/otpGnerate"
 import { sendOtpEmail } from "../config/nodeMailer"
+import { forgetPasswordSchema } from "../zodSchema/userSchema"
 
 
 export const registerAdmin = asyncHandler(async (req: Request, res: Response) => {
@@ -189,3 +190,31 @@ export const adminLoginWithOtp = asyncHandler(async (req: Request, res: Response
 })
 
 
+export const forgetPassword =asyncHandler(async (req: Request, res: Response) => {
+
+    const validate = forgetPasswordSchema.safeParse(req.body)
+    if (!validate.success) {
+        return responseHandler(res, false, validate.error.errors[0].message, 400)
+    }
+
+    const {email} = validate.data
+    const admin = await adminModel.findOne({email})
+
+    if(!admin){
+        return responseHandler(res, false, "Admin not found", 404)  
+    }
+    
+    const otp = generateOtp(6)
+    admin.otp = otp
+
+    sendOtpEmail({
+        to: email,
+        subject: "OTP for verification",
+        otp,
+    });
+
+    await admin.save()
+
+    return responseHandler(res, true, "OTP sent successfully", 200, { otp })    
+
+})
