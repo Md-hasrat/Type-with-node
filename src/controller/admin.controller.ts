@@ -1,6 +1,6 @@
 import { asyncHandler } from "../../utils/errrorHandler"
 import { Request, Response } from "express"
-import { adminLoginSchema, adminLoginWithOtpSchema, adminLogoutSchema, adminRegisterSchema, forgetPasswordAdminSchema, resetPasswordAdminSchema, sendOtpSchema } from "../zodSchema/adminSchema"
+import { adminLoginSchema, adminLoginWithOtpSchema, adminLogoutSchema, adminRegisterSchema, editProfileSchema, forgetPasswordAdminSchema, resetPasswordAdminSchema, sendOtpSchema } from "../zodSchema/adminSchema"
 import { responseHandler } from "../../utils/responseHandler"
 import adminModel from "../models/adminModel"
 import { generateNextCustomId } from "../config/generateUniqueId"
@@ -238,4 +238,30 @@ export const resetPasswordAdmin = asyncHandler(async (req: Request, res: Respons
 
     return responseHandler(res, true, "Password reset successfully", 200, { admin })
 
+})
+
+export const editProfile = asyncHandler(async (req: Request, res: Response) => {
+    const validate = editProfileSchema.safeParse(req.body)
+
+    if (!validate.success) {
+        return responseHandler(res, false, validate.error.errors[0].message, 400)
+    }
+
+    const {id, fullName, email, phone } = validate.data
+
+    const admin = await adminModel.findByIdAndUpdate(
+        id,
+        {
+            fullName,
+            email,
+            phone
+        },
+        { new: true }
+    )
+
+    if (!admin) {
+        return responseHandler(res, false, "Admin not found", 404)
+    }
+
+    return responseHandler(res, true, "Profile updated successfully", 200, { admin })
 })

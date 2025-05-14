@@ -129,3 +129,32 @@ export const resetPasswordAdminSchema = z.object({
     .regex(/[0-9]/, "Confirm password must contain at least one number"),
   opt: z.string().optional(),
 })
+
+export const editProfileSchema = z.object({
+  id: z.string({
+    required_error: "Id is required",
+    invalid_type_error: "Id must be a string",
+  })
+  .max(24, "Invalid credentials"),
+  fullName: z.string({
+    required_error: "Full name is required",
+    invalid_type_error: "Full name must be a string",
+  })
+  .max(100, "Invalid credentials")
+  .optional(),
+  email: z.string({
+    required_error: "Email is required",
+    invalid_type_error: "Email must be a string",
+  })
+  .email({
+    message: "Invalid email format",
+  })
+  .optional(),
+  phone: z.string({
+    required_error: "Phone number is required",
+    invalid_type_error: "Phone number must be a string",
+  })
+  .min(10, "Invalid credentials")
+  .max(15, "Invalid credentials")
+  .optional(),
+})

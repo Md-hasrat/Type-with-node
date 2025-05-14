@@ -1,6 +1,5 @@
 import {Router} from 'express'
-import { adminLoginWithOtp, forgetPassword, getOtp, loginAdmin, logoutAdmin, registerAdmin, resetPasswordAdmin } from '../controller/admin.controller'
-// import { verifyJWTAdmin } from '../middleware/jwt'
+import { adminLoginWithOtp, editProfile, forgetPassword, getOtp, loginAdmin, logoutAdmin, registerAdmin, resetPasswordAdmin } from '../controller/admin.controller'
 
 const router = Router()
 
@@ -11,5 +10,6 @@ router.post("/getOtp",getOtp)
 router.post("/adminLoginWithOtp",adminLoginWithOtp)
 router.post("/forget-Password",forgetPassword)
 router.post("/reset-Password",resetPasswordAdmin)
+router.post("/edit-Profile",editProfile)
 
 export default router
