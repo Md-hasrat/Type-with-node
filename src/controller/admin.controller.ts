@@ -206,6 +206,9 @@ export const forgetPassword =asyncHandler(async (req: Request, res: Response) =>
     
     const otp = generateOtp(6)
     admin.otp = otp
+    admin.resetPasswordExpires = Date.now() + 3600000 
+
+    // console.log( admin.resetPasswordExpires);
 
     sendOtpEmail({
         to: email,
@@ -218,3 +221,4 @@ export const forgetPassword =asyncHandler(async (req: Request, res: Response) =>
     return responseHandler(res, true, "OTP sent successfully", 200, { otp })    
 
 })
+

@@ -87,7 +87,7 @@ export const sendOtpSchema = z.object({
 
 export const adminLoginWithOtpSchema = z.object({
   email: z.string({
-    required_error: "Email is required",  
+    required_error: "Email is required",
     invalid_type_error: "Email must be a string",
   })
     .email("Invalid email format"),
@@ -104,4 +104,33 @@ export const forgetPasswordSchema = z.object({
       required_error: "Email is required!!!"
     })
     .email("Invalid email format!!!")
-})  
+})
+
+export const resetPasswordSchema = z.object({
+  email: z.string().email(),
+  newPassword: z
+  .string({
+    required_error: "New password is required",
+    invalid_type_error: "New password must be a string",
+  })
+  .min(6, "Invalid credentials")
+  .max(100, "Invalid credentials")
+  .regex(/[A-Z]/, "Invalid credentials")
+  .regex(/[a-z]/, "Invalid credentials")
+  .regex(/[0-9]/, "Invalid credentials")
+  .regex(/[^A-Za-z0-9]/, "Invalid credentials"),
+  confirmPassword: z.string({
+    required_error: "Confirm password is required",
+    invalid_type_error: "Confirm password must be a string",
+  })
+  .min(6, "Invalid credentials")
+  .max(100, "Invalid credentials")
+  .regex(/[A-Z]/, "Invalid credentials")
+  .regex(/[a-z]/, "Invalid credentials")
+  .regex(/[0-9]/, "Invalid credentials")
+  .regex(/[^A-Za-z0-9]/, "Invalid credentials"),
+  userType: z.enum(["admin", "subAdmin"], {
+    required_error: "userType is required",
+    invalid_type_error: "userType must be either 'admin' or 'subAdmin'",
+  })
+})
