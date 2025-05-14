@@ -97,3 +97,11 @@ export const adminLoginWithOtpSchema = z.object({
   }),
   accessToken: z.string().optional()
 })
+
+export const forgetPasswordSchema = z.object({
+  email: z
+    .string({
+      required_error: "Email is required!!!"
+    })
+    .email("Invalid email format!!!")
+})  

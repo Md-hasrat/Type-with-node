@@ -16,6 +16,7 @@ interface IAdmin extends Document {
     isCurrentlyLoggedIn: boolean,
     accesToken: string,
     otp: string,
+    resetPasswordExpires: string,
     comparePassword(password: string): Promise<boolean>;
 }
 
@@ -78,6 +79,9 @@ const adminSchema = new Schema({
     otp:{
         type: String,
         default: ""
+    },
+    resetPasswordExpires:{
+        type: String,
     }
 }, {
     timestamps: true
