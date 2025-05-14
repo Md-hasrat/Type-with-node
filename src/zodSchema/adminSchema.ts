@@ -98,7 +98,7 @@ export const adminLoginWithOtpSchema = z.object({
   accessToken: z.string().optional()
 })
 
-export const forgetPasswordSchema = z.object({
+export const forgetPasswordAdminSchema = z.object({
   email: z
     .string({
       required_error: "Email is required!!!"
@@ -106,31 +106,26 @@ export const forgetPasswordSchema = z.object({
     .email("Invalid email format!!!")
 })
 
-export const resetPasswordSchema = z.object({
+export const resetPasswordAdminSchema = z.object({
   email: z.string().email(),
   newPassword: z
-  .string({
-    required_error: "New password is required",
-    invalid_type_error: "New password must be a string",
-  })
-  .min(6, "Invalid credentials")
-  .max(100, "Invalid credentials")
-  .regex(/[A-Z]/, "Invalid credentials")
-  .regex(/[a-z]/, "Invalid credentials")
-  .regex(/[0-9]/, "Invalid credentials")
-  .regex(/[^A-Za-z0-9]/, "Invalid credentials"),
+    .string({
+      required_error: "New password is required",
+      invalid_type_error: "New password must be a string",
+    })
+    .min(6, "Invalid credentials")
+    .max(100, "Invalid credentials")
+    .regex(/[A-Z]/, "New password must contain at least one uppercase letter")
+    .regex(/[a-z]/, "New password must contain at least one lowercase letter")
+    .regex(/[0-9]/, "New password must contain at least one number"),
   confirmPassword: z.string({
     required_error: "Confirm password is required",
     invalid_type_error: "Confirm password must be a string",
   })
-  .min(6, "Invalid credentials")
-  .max(100, "Invalid credentials")
-  .regex(/[A-Z]/, "Invalid credentials")
-  .regex(/[a-z]/, "Invalid credentials")
-  .regex(/[0-9]/, "Invalid credentials")
-  .regex(/[^A-Za-z0-9]/, "Invalid credentials"),
-  userType: z.enum(["admin", "subAdmin"], {
-    required_error: "userType is required",
-    invalid_type_error: "userType must be either 'admin' or 'subAdmin'",
-  })
+    .min(6, "Invalid credentials")
+    .max(100, "Invalid credentials")
+    .regex(/[A-Z]/, "Confirm password must contain at least one uppercase letter")
+    .regex(/[a-z]/, "Confirm password must contain at least one lowercase letter")
+    .regex(/[0-9]/, "Confirm password must contain at least one number"),
+  opt: z.string().optional(),
 })

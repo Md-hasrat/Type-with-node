@@ -1,13 +1,13 @@
 import { asyncHandler } from "../../utils/errrorHandler"
 import { Request, Response } from "express"
-import { adminLoginSchema, adminLoginWithOtpSchema, adminLogoutSchema, adminRegisterSchema, sendOtpSchema } from "../zodSchema/adminSchema"
+import { adminLoginSchema, adminLoginWithOtpSchema, adminLogoutSchema, adminRegisterSchema, forgetPasswordAdminSchema, resetPasswordAdminSchema, sendOtpSchema } from "../zodSchema/adminSchema"
 import { responseHandler } from "../../utils/responseHandler"
 import adminModel from "../models/adminModel"
 import { generateNextCustomId } from "../config/generateUniqueId"
 import jwt from "jsonwebtoken"
 import { generateOtp } from "../config/otpGenerator/otpGnerate"
 import { sendOtpEmail } from "../config/nodeMailer"
-import { forgetPasswordSchema } from "../zodSchema/userSchema"
+import { checkAdminExistence, findAdminByEmail } from "../config/adminExisted/adminExisted"
 
 
 export const registerAdmin = asyncHandler(async (req: Request, res: Response) => {
@@ -18,11 +18,7 @@ export const registerAdmin = asyncHandler(async (req: Request, res: Response) =>
     }
     const { roleId, userType, fullName, email, phone, password } = validate.data
 
-    const existingAdmin = await adminModel.findOne({ email })
-
-    if (existingAdmin) {
-        return responseHandler(res, false, "Email already registered", 400)
-    }
+   await checkAdminExistence(email)
 
     const registrationId = await generateNextCustomId(
         adminModel,
@@ -57,11 +53,7 @@ export const loginAdmin = asyncHandler(async (req: Request, res: Response) => {
 
     const { email, password } = validate.data
 
-    const admin = await adminModel.findOne({ email })
-
-    if (!admin) {
-        return responseHandler(res, false, "Invalid email or password", 401)
-    }
+    const admin = await findAdminByEmail(email) 
 
     const isPasswordValid = await admin.comparePassword(password);
 
@@ -93,7 +85,7 @@ export const loginAdmin = asyncHandler(async (req: Request, res: Response) => {
 })
 
 
-export const logoutAdmin =asyncHandler(async (req: Request, res: Response) => {
+export const logoutAdmin = asyncHandler(async (req: Request, res: Response) => {
 
     // console.log("Request body:", req.body); 
 
@@ -111,27 +103,23 @@ export const logoutAdmin =asyncHandler(async (req: Request, res: Response) => {
     admin.isCurrentlyLoggedIn = false
     await admin.save()
 
-    return responseHandler(res, true, "Admin logged out successfully", 200,{admin}) 
+    return responseHandler(res, true, "Admin logged out successfully", 200, { admin })
 })
 
 
 export const getOtp = asyncHandler(async (req: Request, res: Response) => {
     const validate = sendOtpSchema.safeParse(req.body)
 
-    if(!validate.success){
+    if (!validate.success) {
         return responseHandler(res, false, validate.error.errors[0].message, 400)
     }
 
-    const {email} = validate.data
-    const admin = await adminModel.findOne({email})
-
-    if(!admin){
-        return responseHandler(res, false, "Admin not found", 404)  
-    }
+    const { email } = validate.data
+    const admin = await findAdminByEmail(email)
 
     const otp = generateOtp(6)
     // console.log("Generated OTP:", otp);
-    
+
     admin.otp = otp
     await admin.save()
 
@@ -148,19 +136,16 @@ export const getOtp = asyncHandler(async (req: Request, res: Response) => {
 export const adminLoginWithOtp = asyncHandler(async (req: Request, res: Response) => {
     const validate = adminLoginWithOtpSchema.safeParse(req.body)
 
-    if(!validate.success){
-        return responseHandler(res, false, validate.error.errors[0].message, 400)   
+    if (!validate.success) {
+        return responseHandler(res, false, validate.error.errors[0].message, 400)
     }
 
-    const {email,otp} = validate.data
-    const admin =await adminModel.findOne({email})
+    const { email, otp } = validate.data
+    // check for admin existence
+    const admin = await findAdminByEmail(email)
 
-    if(!admin){
-        return responseHandler(res, false, "Admin not found", 404)  
-    }
-
-    if(admin.otp !== otp){
-        return responseHandler(res, false, "Invalid OTP", 401)  
+    if (admin.otp !== otp) {
+        return responseHandler(res, false, "Invalid OTP", 401)
     }
 
     admin.otp = undefined
@@ -190,23 +175,20 @@ export const adminLoginWithOtp = asyncHandler(async (req: Request, res: Response
 })
 
 
-export const forgetPassword =asyncHandler(async (req: Request, res: Response) => {
+export const forgetPassword = asyncHandler(async (req: Request, res: Response) => {
 
-    const validate = forgetPasswordSchema.safeParse(req.body)
+    const validate = forgetPasswordAdminSchema.safeParse(req.body)
     if (!validate.success) {
         return responseHandler(res, false, validate.error.errors[0].message, 400)
     }
 
-    const {email} = validate.data
-    const admin = await adminModel.findOne({email})
+    const { email } = validate.data
+    // check for admin existence
+    const admin = await findAdminByEmail(email)
 
-    if(!admin){
-        return responseHandler(res, false, "Admin not found", 404)  
-    }
-    
     const otp = generateOtp(6)
     admin.otp = otp
-    admin.resetPasswordExpires = Date.now() + 3600000 
+    admin.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000)
 
     // console.log( admin.resetPasswordExpires);
 
@@ -218,7 +200,42 @@ export const forgetPassword =asyncHandler(async (req: Request, res: Response) =>
 
     await admin.save()
 
-    return responseHandler(res, true, "OTP sent successfully", 200, { otp })    
+    return responseHandler(res, true, "OTP sent successfully", 200, { otp })
 
 })
 
+
+export const resetPasswordAdmin = asyncHandler(async (req: Request, res: Response) => {
+    const validate = resetPasswordAdminSchema.safeParse(req.body)
+
+    if (!validate.success) {
+        return responseHandler(res, false, validate.error.errors[0].message, 400)
+    }
+
+    const { email, newPassword, confirmPassword, opt } = validate.data
+
+    const admin = await findAdminByEmail(email)
+
+    if (!admin.resetPasswordExpires || admin.resetPasswordExpires.getTime() < Date.now()) {
+        return responseHandler(res, false, "OTP has expired", 400);
+    }
+
+    if (admin.otp !== opt) {
+        return responseHandler(res, false, "Invalid OTP", 401)
+    }
+
+    if (newPassword !== confirmPassword) {
+        return responseHandler(res, false, "Passwords do not match", 400)
+    }
+
+    const hashedPassword = await adminModel.hashPassword(newPassword)
+
+    admin.password = hashedPassword
+    admin.otp = undefined
+    admin.resetPasswordExpires = undefined
+
+    await admin.save()
+
+    return responseHandler(res, true, "Password reset successfully", 200, { admin })
+
+})
