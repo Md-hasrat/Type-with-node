@@ -120,7 +120,51 @@ export const getSubadminById = asyncHandler(async (req: Request, res: Response) 
         }
     ])
 
+    if (subadminWithRole.length === 0) {
+        return responseHandler(res, false, "Sub admin not found", 404)
+    }
+
     return responseHandler(res, true, "Sub admin found successfully", 200, subadminWithRole[0])
 
 })
 
+
+export const deleteSubAdmin = asyncHandler(async (req: Request, res: Response) => {
+    const validate = getAdminByIdSchema.safeParse({
+        params: req.params,
+    })
+
+    if (!validate.success) {
+        return responseHandler(res, false, validate.error.errors[0].message, 400)
+    }
+
+    const objectId = new mongoose.Types.ObjectId(validate.data.params.id)
+
+    const existingSubAdmin = await adminModel.findById(objectId)
+
+    if (!existingSubAdmin) {
+        return responseHandler(res, false, "Sub admin not found", 404)
+    }
+
+    if (existingSubAdmin.userType === "admin") {
+        return responseHandler(res, false, "You can't delete admin", 400)
+    }
+
+    if (existingSubAdmin.isDeleted) {
+        return responseHandler(res, false, "Sub admin is already deleted", 400);
+    }
+
+    const deletedSubAdmin = await adminModel.findByIdAndUpdate(
+        objectId,
+        {
+            isDeleted: true
+        },
+        { new: true }
+    )
+
+    return responseHandler(res, true, "Sub admin deleted successfully", 200, 
+        {
+            id: deletedSubAdmin._id,
+            fullName: deletedSubAdmin.fullName
+        })
+})
