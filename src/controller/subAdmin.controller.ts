@@ -78,4 +78,49 @@ export const updateSubAdmin = asyncHandler(async (req: Request, res: Response) =
 });
 
 
- 
+export const getSubadminById = asyncHandler(async (req: Request, res: Response) => {
+    const validate = getAdminByIdSchema.safeParse({
+        params: req.params,
+    })
+
+    if (!validate.success) {
+        return responseHandler(res, false, validate.error.errors[0].message, 400)
+    }
+
+    const objectId = new mongoose.Types.ObjectId(validate.data.params.id)
+
+    const subadminWithRole = await adminModel.aggregate([
+        {
+            $match: {
+                _id: objectId,
+                isDeleted: false,
+                userType: "subAdmin"
+            }
+        },
+
+        {
+            $lookup: {
+                from: "roles",
+                localField: "roleId",
+                foreignField: "_id",
+                as: "roleDetails"
+            }
+        },
+        { $unwind: "$roleDetails" },
+        {
+            $project: {
+                _id: 1,
+                registrationId: 1,
+                fullName: 1,
+                email: 1,
+                phone: 1,
+                userType: 1,
+                role: "$roleDetails.roleName"
+            }
+        }
+    ])
+
+    return responseHandler(res, true, "Sub admin found successfully", 200, subadminWithRole[0])
+
+})
+
