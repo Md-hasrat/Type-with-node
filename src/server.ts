@@ -4,6 +4,7 @@ import userRoute from "./routes/user.route"
 import foodRoute from "./routes/foodWaste.route"
 import adminRoute from "./routes/admin.route"
 import roleRoute from "./routes/role.route"
+import subAdminRoute from './routes/subAdmin.route'
 
 import "dotenv/config"
 
@@ -24,6 +25,7 @@ app.use("/api/user",userRoute)
 app.use("/api/food-waste",foodRoute)
 app.use("/api/admin",adminRoute)
 app.use("/api/role",roleRoute)
+app.use("/api/subadmin",subAdminRoute)
 
 
 connectDB()

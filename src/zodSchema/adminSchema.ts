@@ -158,3 +158,10 @@ export const editProfileSchema = z.object({
   .max(15, "Invalid credentials")
   .optional(),
 })
+
+export const getAdminSchema = z.object({
+  adminId: z
+    .string()
+    .regex(/^[0-9a-fA-F]{24}$/, "Invalid admin id"),
+  accessToken: z.string().optional()
+})

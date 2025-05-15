@@ -1,6 +1,6 @@
 import { asyncHandler } from "../../utils/errrorHandler"
 import { Request, Response } from "express"
-import { adminLoginSchema, adminLoginWithOtpSchema, adminLogoutSchema, adminRegisterSchema, editProfileSchema, forgetPasswordAdminSchema, resetPasswordAdminSchema, sendOtpSchema } from "../zodSchema/adminSchema"
+import { adminLoginSchema, adminLoginWithOtpSchema, adminLogoutSchema, adminRegisterSchema, editProfileSchema, forgetPasswordAdminSchema, getAdminSchema, resetPasswordAdminSchema, sendOtpSchema } from "../zodSchema/adminSchema"
 import { responseHandler } from "../../utils/responseHandler"
 import adminModel from "../models/adminModel"
 import { generateNextCustomId } from "../config/generateUniqueId"
@@ -265,3 +265,22 @@ export const editProfile = asyncHandler(async (req: Request, res: Response) => {
 
     return responseHandler(res, true, "Profile updated successfully", 200, { admin })
 })
+
+
+export const getAdmin = asyncHandler(async (req: Request, res: Response) => {
+    const validate = getAdminSchema.safeParse(req.body)
+
+    if(!validate.success) {
+        return responseHandler(res, false, validate.error.errors[0].message, 400)
+    }
+
+    const {adminId} = validate.data
+    const admin = await adminModel.findById(adminId)
+
+    if(!admin) {
+        return responseHandler(res, false, "Admin not found", 404)
+    }
+
+    return responseHandler(res, true, "Admin found successfully", 200, { admin })
+})
+

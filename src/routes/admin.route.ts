@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import { adminLoginWithOtp, editProfile, forgetPassword, getOtp, loginAdmin, logoutAdmin, registerAdmin, resetPasswordAdmin } from '../controller/admin.controller'
+import { adminLoginWithOtp, editProfile, forgetPassword, getAdmin, getOtp, loginAdmin, logoutAdmin, registerAdmin, resetPasswordAdmin } from '../controller/admin.controller'
 
 const router = Router()
 
@@ -11,5 +11,6 @@ router.post("/adminLoginWithOtp",adminLoginWithOtp)
 router.post("/forget-Password",forgetPassword)
 router.post("/reset-Password",resetPasswordAdmin)
 router.post("/edit-Profile",editProfile)
+router.post("/getAdmin",getAdmin)
 
 export default router

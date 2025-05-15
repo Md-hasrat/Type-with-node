@@ -35,7 +35,7 @@ const adminSchema = new Schema({
     },
     roleId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "role",
+        ref: "Role",
         required: true
     },
     fullName: {
