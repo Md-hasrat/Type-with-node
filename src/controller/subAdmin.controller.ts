@@ -1,6 +1,6 @@
 import { asyncHandler } from "../../utils/errrorHandler";
 import { Request, Response } from "express";
-import { getAdminByIdSchema, updateSubAdminSchema } from "../zodSchema/subAdminSchema";
+import { getAdminByIdSchema, subadminSearchQuerySchema, updateSubAdminSchema } from "../zodSchema/subAdminSchema";
 import { responseHandler } from "../../utils/responseHandler";
 import adminModel from "../models/adminModel";
 import mongoose from "mongoose";
@@ -162,9 +162,60 @@ export const deleteSubAdmin = asyncHandler(async (req: Request, res: Response) =
         { new: true }
     )
 
-    return responseHandler(res, true, "Sub admin deleted successfully", 200, 
+    return responseHandler(res, true, "Sub admin deleted successfully", 200,
         {
             id: deletedSubAdmin._id,
             fullName: deletedSubAdmin.fullName
         })
 })
+
+
+
+export const getAllSubadmin = asyncHandler(async (req: Request, res: Response) => {
+  // Parse and validate query params with defaults
+  const { search, page, limit } = subadminSearchQuerySchema.parse(req.query);
+  const skip = (page - 1) * limit;
+
+  // Build base match filter
+  const matchStage: Record<string, any> = {
+    isDeleted: false,
+    userType: 'subAdmin',
+  };
+
+  if (search) {
+    matchStage.$or = [
+      { fullName: { $regex: search, $options: 'i' } },
+      { registrationId: { $regex: search, $options: 'i' } },
+      { email: { $regex: search, $options: 'i' } },
+    ];
+  }
+
+  // Count total matching documents (for pagination metadata)
+  const total = await adminModel.countDocuments(matchStage);
+
+  // Fetch paginated subadmins with role lookup
+  const subadmins = await adminModel.aggregate([
+    { $match: matchStage },
+    {
+      $lookup: {
+        from: 'roles', // Ensure this is the correct roles collection name
+        localField: 'roleId',
+        foreignField: '_id',
+        as: 'role',
+      },
+    },
+    { $unwind: { path: '$role', preserveNullAndEmptyArrays: true } },
+    { $sort: { createdAt: -1 } },
+    { $skip: skip },
+    { $limit: limit },
+  ]);
+
+  return responseHandler(res, true, 'Subadmins fetched successfully', 200, {
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+    data: subadmins,
+  });
+});
+

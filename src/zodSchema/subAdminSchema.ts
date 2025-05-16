@@ -47,3 +47,22 @@ export const getAdminByIdSchema = z.object({
             .max(24, "Invalid credentials"),
     })
 })
+
+
+export const subadminSearchQuerySchema = z.object({
+  search: z.string().trim().optional(),
+
+  page: z
+    .preprocess((val) => parseInt(String(val), 10), z.number().int())
+    .default(1)
+    .refine((val) => val >= 1, {
+      message: 'Page must be at least 1',
+    }),
+
+  limit: z
+    .preprocess((val) => parseInt(String(val), 10), z.number().int())
+    .default(10)
+    .refine((val) => val >= 10, {
+      message: 'Limit must be at least 10',
+    }),
+});
