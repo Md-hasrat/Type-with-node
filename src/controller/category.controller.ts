@@ -15,3 +15,8 @@ export const createCategory = asyncHandler(async(req:Request, res:Response)=>{
     const newCategory = await Category.create(validate.data)
     return responseHandler(res,true,"Category created successfully",200,newCategory)    
 })
+
+export const getAllCategory = asyncHandler(async(req:Request, res:Response)=>{
+    const category = await Category.find()
+    return responseHandler(res,true,"Category fetched successfully",200,category)
+})
