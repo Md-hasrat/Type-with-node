@@ -1,6 +1,6 @@
 import { asyncHandler } from "../../utils/errrorHandler";
 import { Request, Response } from "express";
-import { createCategorySchema, updateCategorySchema } from "../zodSchema/categorySchema";
+import { categoryIdSchema, createCategorySchema, updateCategorySchema } from "../zodSchema/categorySchema";
 import { responseHandler } from "../../utils/responseHandler";
 import Category from "../models/categoryModel";
 
@@ -41,3 +41,21 @@ export const updateCategory  =  asyncHandler(async(req:Request, res:Response)=>{
     
     return responseHandler(res,true,"Category updated successfully",200,updatedCategory)
 })
+
+
+export const deleteCategoryById = asyncHandler(async(req:Request, res:Response)=>{
+    const validate = categoryIdSchema.safeParse(req.body)
+
+    if(!validate.success){
+        return responseHandler(res,false,validate.error.errors[0].message,400)
+    }
+
+    const deletedCategory = await Category.findByIdAndDelete(validate.data.id)  
+
+    if(!deletedCategory){
+        return responseHandler(res,false,"Category not found",404)
+    }
+
+    return responseHandler(res,true,"Category deleted successfully",200,deletedCategory)
+})
+

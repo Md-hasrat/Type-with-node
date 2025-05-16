@@ -18,9 +18,7 @@ app.use(express.json());
 // Middleware to parse URL-encoded form data
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/test',(req:Request,res:Response):void=>{
-    res.json({data: "Hello world!!!"})
-})
+
 
 app.use("/api/user",userRoute)
 app.use("/api/food-waste",foodRoute)
@@ -30,10 +28,14 @@ app.use("/api/subadmin",subAdminRoute)
 app.use("/api/category",categoryRoute)
 
 
+
+
+
+
 connectDB()
 
 
-app.listen(3000, (): void => {
-    console.log('Server is running on port 3000');
+app.listen(8080, (): void => {
+    console.log('Server is running on port 8080');
 })  
 
