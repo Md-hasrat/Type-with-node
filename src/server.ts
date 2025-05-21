@@ -34,9 +34,6 @@ app.use("/api/faqCategory",faqCatrogoryRoute)
 
 
 
-
-
-
 connectDB()
 
 
