@@ -1,25 +1,30 @@
-import { Schema, model, Document } from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose";
+import { CategoryInput } from "../zodSchema/categorySchema";
 
-export interface IFaqCategory extends Document {
-    title: string;
-    status: 'draft' | 'published' | 'archived';
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-export const faqCategorySchema = new Schema<IFaqCategory>({
+const CategorySchema: Schema = new Schema(
+  {
     title: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true
+      type: String,
+      required: true,
+      trim: true,
     },
-    status: {
-        type: String,
-        enum: ['draft', 'published', 'archived'],
-        default: 'draft'
-    }
-}, { timestamps: true });
 
-const FaqCategory = model<IFaqCategory>("FaqCategory", faqCategorySchema);
-export default FaqCategory;
+    status: {
+      type: String,
+      enum: ["draft", "published", "archived"],
+      default: "draft",
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+
+const faqCategoryModel = mongoose.model<CategoryInput>(
+  "FaqCategory",
+  CategorySchema,
+  "faqcategories" // force plural form
+);
+
+export default faqCategoryModel;

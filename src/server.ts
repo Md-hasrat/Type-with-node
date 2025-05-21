@@ -7,6 +7,7 @@ import roleRoute from "./routes/role.route"
 import subAdminRoute from './routes/subAdmin.route'
 import categoryRoute from './routes/category.route'
 import faqRoute from './routes/faq.route'
+import faqCatrogoryRoute from './routes/faqCategory.route'
 
 
 import "dotenv/config"
@@ -29,6 +30,7 @@ app.use("/api/role",roleRoute)
 app.use("/api/subadmin",subAdminRoute)
 app.use("/api/category",categoryRoute)
 app.use("/api/faq",faqRoute)
+app.use("/api/faqCategory",faqCatrogoryRoute)
 
 
 

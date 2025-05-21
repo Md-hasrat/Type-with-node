@@ -15,7 +15,7 @@ const categorySchema = new Schema({
     },
     status: {
         type: String,
-        enum: ['draft', 'published',"archieved"],
+        enum: ['draft', 'published', 'archived'],
        default: 'draft'
     }
 }, { timestamps: true })

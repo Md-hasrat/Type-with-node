@@ -1,17 +1,22 @@
 import { asyncHandler } from "../../utils/errrorHandler";
-import { Request, Response } from "express";
-import { createFaqCategorySchema } from "../zodSchema/faqCategorySchema";
-import FaqCategory from "../models/faqCategoryModel";
 import { responseHandler } from "../../utils/responseHandler";
+import faqCategoryModel from "../models/faqCategoryModel";
+import { createFaqCategorySchema } from "../zodSchema/faqCategorySchema";
+import { Request, Response } from "express";
 
+export const createFaqCategory = asyncHandler(async (req: Request, res: Response) => {
 
-export const createFaqCategory = asyncHandler( async (req: Request, res: Response) => {
-    const validate = createFaqCategorySchema.safeParse(req.body)
+  // Validate request body
+  const validation = createFaqCategorySchema.safeParse(req.body);
 
-    if(!validate.success){
-        return responseHandler(res,false,validate.error.errors[0].message,400)
-    }
+  if (!validation.success) {
+    // Return first error message and 400 status
+    return responseHandler(res, false, validation.error.errors[0].message, 400);
+  }
 
-    const newCategory = await FaqCategory.create(validate.data)
-    return responseHandler(res,true,"Category created successfully",200,newCategory)    
-})
+  // Create FAQ category document
+  const newFaqCategory = await faqCategoryModel.create(validation.data);
+
+  // Send success response
+  return responseHandler(res, true, "FAQ Category created successfully", 200, newFaqCategory);
+});

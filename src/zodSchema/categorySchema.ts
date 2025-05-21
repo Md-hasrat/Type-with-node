@@ -49,3 +49,8 @@ export const categoryIdSchema = z.object({
     })
     .min(24, "Invalid credentials")
 })
+
+
+
+// Type 
+export type CategoryInput = z.infer<typeof createCategorySchema>;
