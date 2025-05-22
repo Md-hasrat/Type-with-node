@@ -4,11 +4,11 @@ import {z} from 'zod'
 export const createStaticSchema = z.object({
     name: z
         .string({
-            required_error: "Title is required!!!",
-            invalid_type_error: "Title must be a string",
+            required_error: "Name is required!!!",
+            invalid_type_error: "Name must be a string",
         })
-        .min(2, "Title must be at least 2 characters long")
-        .max(100, "Title must be at most 100 characters long"),
+        .min(2, "Name must be at least 2 characters long")
+        .max(100, "Name must be at most 100 characters long"),
 
     description: z
         .string({

@@ -21,3 +21,9 @@ export const createStaticContent  = asyncHandler(async(req:Request, res:Response
     const staticContent = await StaticContent.create(validate.data)
     return responseHandler(res,true,"Static content created successfully",200,staticContent)
 })
+
+
+export const getAllStaticContent = asyncHandler(async(req:Request, res:Response)=>{
+    const staticContent = await StaticContent.find()
+    return responseHandler(res,true,"Static content fetched successfully",200,staticContent)
+})
