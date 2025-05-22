@@ -27,3 +27,4 @@ export const getAllStaticContent = asyncHandler(async(req:Request, res:Response)
     const staticContent = await StaticContent.find()
     return responseHandler(res,true,"Static content fetched successfully",200,staticContent)
 })
+

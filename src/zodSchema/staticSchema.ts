@@ -1,3 +1,4 @@
+import mongoose from 'mongoose'
 import {z} from 'zod'
 
 
@@ -19,3 +20,15 @@ export const createStaticSchema = z.object({
         .max(10000, "Description must be at most 10000 characters long"),
 })
 
+
+export const staticSchemaId = z.object({
+    id: z
+        .string({
+            required_error: "Id is required!!!",
+            invalid_type_error: "Id must be a string",
+        })
+        .refine((val) => mongoose.Types.ObjectId.isValid(val), {
+            message: "Id must be a valid ObjectId",
+        })
+        .transform((val) => new mongoose.Types.ObjectId(val)),
+})
