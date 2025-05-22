@@ -1,6 +1,6 @@
 import { asyncHandler } from "../../utils/errrorHandler";
 import { Request, Response } from "express";
-import { createFaqSchema, faqQuerySchema, updateFaqSchema } from "../zodSchema/faqSchema";
+import { createFaqSchema, faqCategorySchemaById, faqQuerySchema, updateFaqSchema } from "../zodSchema/faqSchema";
 import { responseHandler } from "../../utils/responseHandler";
 // import Category from "../models/categoryModel";
 import { getAllFaqQuery } from "../services/faqService";
@@ -53,3 +53,23 @@ export const updateFaqCategoryById = asyncHandler(async (req: Request, res: Resp
   return responseHandler(res, true, "Category updated successfully", 200, updatedCategory);
 
 })
+
+
+export const deleteFaqCategoryById = asyncHandler(async (req: Request, res: Response) => {
+  const validate = faqCategorySchemaById.safeParse(req.body);
+
+  if (!validate.success) {
+    return responseHandler(res, false, validate.error.errors[0].message, 400)
+  }
+
+  const deletedCategory = await Faq.findByIdAndDelete(validate.data.id);
+
+  if (!deletedCategory) {
+    return responseHandler(res, false, "Category not found", 404);
+  }
+
+  return responseHandler(res, true, "Category deleted successfully", 200, deletedCategory);
+
+})  
+
+
