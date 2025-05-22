@@ -73,3 +73,19 @@ export const deleteFaqCategoryById = asyncHandler(async (req: Request, res: Resp
 })  
 
 
+export const getFaqCategoryById = asyncHandler(async (req: Request, res: Response) => {
+  const validate = faqCategorySchemaById.safeParse(req.body);
+
+  if (!validate.success) {
+    return responseHandler(res, false, validate.error.errors[0].message, 400)
+  }
+
+  const category = await Faq.findById(validate.data.id);
+
+  if (!category) {
+    return responseHandler(res, false, "Category not found", 404);
+  }
+
+  return responseHandler(res, true, "Category fetched successfully", 200, category);
+})
+
