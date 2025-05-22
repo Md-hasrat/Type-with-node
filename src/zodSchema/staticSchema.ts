@@ -21,7 +21,7 @@ export const createStaticSchema = z.object({
 })
 
 
-export const staticSchemaId = z.object({
+export const staticUpdateSchema = z.object({
     id: z
         .string({
             required_error: "Id is required!!!",
@@ -51,3 +51,15 @@ export const staticSchemaId = z.object({
 
 })
 
+
+export const staticSchemaId = z.object({
+    id: z
+        .string({
+            required_error: "Id is required!!!",
+            invalid_type_error: "Id must be a string",
+        })
+        .refine((val) => mongoose.Types.ObjectId.isValid(val), {
+            message: "Id must be a valid ObjectId",
+        })
+        .transform((val) => new mongoose.Types.ObjectId(val)),
+})
