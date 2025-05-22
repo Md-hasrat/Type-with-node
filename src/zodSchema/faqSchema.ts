@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { z } from "zod";
 
 
@@ -93,10 +94,19 @@ export const updateFaqSchema = z.object({
     .min(3, "Answer must be at least 3 characters long")
     .max(100, "Answer must be at most 100 characters long")
     .optional(),
-    
+
   status: z
     .string()
     .optional()
     .default("draft"),
 });
 
+
+export const faqCategorySchemaById = z.object({
+  id: z
+    .string({ required_error: "Id is required" })
+    .refine((val) => mongoose.Types.ObjectId.isValid(val), {
+      message: "Id must be a valid ObjectId",
+    })
+    .transform((val) => new mongoose.Types.ObjectId(val)),
+});
