@@ -67,3 +67,36 @@ export const faqQuerySchema = z.object({
     .default(10),
 });
 
+
+export const updateFaqSchema = z.object({
+  id: z
+    .string({
+      required_error: "Id is required!!!",
+      invalid_type_error: "Id must be a string",
+    })
+    .length(24, "Invalid id length"),
+
+  question: z
+    .string({
+      required_error: "Question is required!!!",
+      invalid_type_error: "Question must be a string",
+    })
+    .min(3, "Question must be at least 3 characters long")
+    .max(100, "Question must be at most 100 characters long")
+    .optional(),
+
+  answer: z
+    .string({
+      required_error: "Answer is required!!!",
+      invalid_type_error: "Answer must be a string",
+    })
+    .min(3, "Answer must be at least 3 characters long")
+    .max(100, "Answer must be at most 100 characters long")
+    .optional(),
+    
+  status: z
+    .string()
+    .optional()
+    .default("draft"),
+});
+

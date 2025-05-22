@@ -1,21 +1,21 @@
 import { asyncHandler } from "../../utils/errrorHandler";
 import { Request, Response } from "express";
-import { createFaqSchema, faqQuerySchema } from "../zodSchema/faqSchema";
+import { createFaqSchema, faqQuerySchema, updateFaqSchema } from "../zodSchema/faqSchema";
 import { responseHandler } from "../../utils/responseHandler";
 // import Category from "../models/categoryModel";
 import { getAllFaqQuery } from "../services/faqService";
 import Faq from "../models/faqModel";
 
 
-export const createFaq = asyncHandler(async(req:Request, res:Response)=>{
-    const validate = createFaqSchema.safeParse( req.body );
+export const createFaq = asyncHandler(async (req: Request, res: Response) => {
+  const validate = createFaqSchema.safeParse(req.body);
 
-    if(!validate.success){
-        return responseHandler(res,false,validate.error.errors[0].message,400)
-    }   
+  if (!validate.success) {
+    return responseHandler(res, false, validate.error.errors[0].message, 400)
+  }
 
-    const newCategory = await Faq.create(validate.data)
-    return responseHandler(res,true,"Category created successfully",200,newCategory)
+  const newCategory = await Faq.create(validate.data)
+  return responseHandler(res, true, "Category created successfully", 200, newCategory)
 })
 
 
@@ -31,3 +31,25 @@ export const getAllFaqCategory = asyncHandler(async (req: Request, res: Response
 
   return responseHandler(res, true, "FAQ fetched successfully", 200, result);
 });
+
+
+export const updateFaqCategoryById = asyncHandler(async (req: Request, res: Response) => {
+  const validate = updateFaqSchema.safeParse(req.body);
+
+  if (!validate.success) {
+    return responseHandler(res, false, validate.error.errors[0].message, 400)
+  }
+
+  const updatedCategory = await Faq.findByIdAndUpdate(
+    validate.data.id,
+    { $set: validate.data }, // Explicitly using $set
+    { new: true }
+  );
+
+  if (!updatedCategory) {
+    return responseHandler(res, false, "Category not found", 404);
+  }
+
+  return responseHandler(res, true, "Category updated successfully", 200, updatedCategory);
+
+})
