@@ -9,6 +9,7 @@ import categoryRoute from './routes/category.route'
 import faqRoute from './routes/faq.route'
 import faqCatrogoryRoute from './routes/faqCategory.route'
 import staticRoute from "./routes/static.route"
+import articleRoute from "./routes/article.route"
 
 
 import "dotenv/config"
@@ -33,6 +34,7 @@ app.use("/api/category",categoryRoute)
 app.use("/api/faq",faqRoute)
 app.use("/api/faqCategory",faqCatrogoryRoute)
 app.use("/api/static",staticRoute)
+app.use("/api/article",articleRoute)
 
 
 
