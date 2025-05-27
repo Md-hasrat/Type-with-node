@@ -15,7 +15,7 @@ export const userRegisterSchema = z.object({
     password: z
         .string({
             required_error: "Password is required!!!"
-        })
+        }),
 })
 
 
@@ -97,6 +97,12 @@ export const resetPasswordSchema = z.object({
 export const deleteUserSchema = z
     .object({
         id: z.string().min(1).max(24),
+        isDeleted: z.boolean(
+            {
+                required_error: "isDeleted is required",
+                invalid_type_error: "isDeleted must be a boolean",
+            }
+        )
     })
 
 export const getUserSchema = z.object({
@@ -105,8 +111,10 @@ export const getUserSchema = z.object({
             required_error: "Email is required!!!"
         })
         .email("Invalid email format!!!"),
+        
 })
 
 export const updateUserSchema = z.object({
     username: z.string().optional(),
+    userType: z.enum(["user", "admin", "subAdmin"]).optional(),
 })

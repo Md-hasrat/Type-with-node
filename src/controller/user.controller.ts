@@ -35,7 +35,7 @@ export const userRegister = asyncHandler(async (req: Request, res: Response) => 
     const user = new User({
         username,
         email,
-        password: hashedPassword
+        password: hashedPassword,
     })
 
     await user.save()
@@ -331,11 +331,11 @@ export const updateUser = asyncHandler(async (req: AuthenticatedRequest, res: Re
         return responseHandler(res, false, "User not found", 401)   
     }
 
-    const {username} = validate.data
+    const {username,userType} = validate.data
 
     const user = await User.findByIdAndUpdate(
         userId,
-        {username},
+        {username,userType},
         {new: true}
     )
 

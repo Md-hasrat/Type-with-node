@@ -12,6 +12,9 @@ interface UserI extends Document {
     otpExpire: Date,
     isVerified: boolean,
     createdAt: Date,
+    isDeleted: boolean,
+    userType: string,
+    isBlocked: boolean,
     userLogedIn(): Promise<void>,
     comparePassword(password: string): Promise<boolean>
 
@@ -56,6 +59,19 @@ const userSchema: Schema = new Schema<UserI>({
         type: Boolean,
         default: false       
     },
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
+    userType: {
+        type: String,
+        enum: ['admin', 'subAdmin', 'user'],
+        default: 'user'
+    },
+    isBlocked: {
+        type: Boolean,
+        default: false
+    }
 }, { timestamps: true })
 
 
